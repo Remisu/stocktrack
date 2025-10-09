@@ -1,0 +1,36 @@
+// server/prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}
+
+model Product {
+  id        Int      @id @default(autoincrement())
+  name      String
+  sku       String   @unique
+  price     Decimal  @db.Decimal(10, 2)
+  stock     Int      @default(0)
+  createdAt DateTime @default(now())
+  Sale      Sale[]
+}
+
+model Sale {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  quantity  Int      @default(1)
+  total     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  product   Product  @relation(fields: [productId], references: [id])
+}
