@@ -1,9 +1,12 @@
+import multerLib from 'multer';
+import type { MulterError } from 'multer';
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import authRouter from './routes/auth';
 import { requireAuth } from './routes/requireAuth';
+import uploadRouter from './routes/upload';
 
 const app = express();
 app.use(cors());
@@ -18,6 +21,7 @@ app.get('/', (_req, res) => {
 
 // Auth routes
 app.use(authRouter);
+app.use(uploadRouter); // image upload routes
 
 // Healthcheck
 app.get('/api/health', (_req, res) => res.json({ ok: true }));

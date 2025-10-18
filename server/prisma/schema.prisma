@@ -20,6 +20,7 @@ model Product {
   sku       String   @unique
   price     Decimal  @db.Decimal(10, 2)
   stock     Int      @default(0)
+  imageUrl  String? // <-- este campo precisa existir
   createdAt DateTime @default(now())
   Sale      Sale[]
 }
