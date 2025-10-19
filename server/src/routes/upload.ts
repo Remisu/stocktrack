@@ -21,6 +21,9 @@ const upload = multer({
 
 router.post('/api/products/:id/image', requireAuth, upload.single('file'), async (req, res) => {
   try {
+    if (!process.env.S3_ENDPOINT || !process.env.S3_ACCESS_KEY || !process.env.S3_SECRET_KEY || !process.env.S3_BUCKET) {
+      return res.status(503).json({ error: 'storage_not_configured', detail: 'Object storage (MinIO/S3) is not configured on this environment.' });
+    }
     const id = Number(req.params.id);
     if (Number.isNaN(id)) return res.status(400).json({ error: 'invalid id' });
     if (!req.file) return res.status(400).json({ error: 'file is required' });

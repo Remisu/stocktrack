@@ -24,7 +24,14 @@ app.use(authRouter);
 app.use(uploadRouter); // image upload routes
 
 // Healthcheck
-app.get('/api/health', (_req, res) => res.json({ ok: true }));
+app.get('/api/health', async (_req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({ ok: true, db: 'up' });
+  } catch {
+    res.status(503).json({ ok: false, db: 'down', detail: 'Database is not reachable' });
+  }
+});
 
 // Products
 app.get('/api/products', async (_req, res) => {
