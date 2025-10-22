@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '../lib/api';
 import AppLayout from '../layouts/AppLayout';
 import Modal from '../components/Modal';
+import toast from 'react-hot-toast';
 
 const schema = z.object({
   name: z.string().min(1, 'Nome obrigatório'),
@@ -26,7 +27,6 @@ type Product = {
 export default function Products({ onLogout }: { onLogout: () => void }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState('');
-  const [uploadingId, setUploadingId] = useState<number | null>(null);
 
   // Modals
   const [openCreate, setOpenCreate] = useState(false);
@@ -36,12 +36,18 @@ export default function Products({ onLogout }: { onLogout: () => void }) {
   const createForm = useForm<FormData>({ resolver: zodResolver(schema) });
   const [createImage, setCreateImage] = useState<File | null>(null);
 
-  // Form edição (modal) — usaremos valores padrão quando abrir
+  // Form edição (modal)
   const editForm = useForm<FormData>({ resolver: zodResolver(schema) });
+  const [editImage, setEditImage] = useState<File | null>(null);
 
   const load = async () => {
-    const { data } = await api.get<Product[]>('/api/products');
-    setProducts(data);
+    try {
+      const { data } = await api.get<Product[]>('/api/products');
+      setProducts(data);
+    } catch (e) {
+      console.error(e);
+      toast.error('Falha ao carregar produtos.');
+    }
   };
 
   useEffect(() => { load(); }, []);
@@ -55,44 +61,54 @@ export default function Products({ onLogout }: { onLogout: () => void }) {
     );
   }, [products, query]);
 
-  // Upload imagem (reutilizável)
+  // Upload imagem (com toasts)
   const onUpload = async (id: number, file: File | null) => {
     if (!file) return;
+    const t = toast.loading('Enviando imagem...');
     try {
-      setUploadingId(id);
       const form = new FormData();
       form.append('file', file);
       await api.post(`/api/products/${id}/image`, form);
       await load();
+      toast.success('Imagem enviada!', { id: t });
     } catch (e) {
       console.error(e);
-      alert('Falha no upload da imagem (verifique login e tamanho/formatos).');
-    } finally {
-      setUploadingId(null);
+      toast.error('Falha no upload (login/tamanho/tipo?)', { id: t });
     }
   };
 
-  // A) Criar (modal)
+  const closeEditModal = () => {
+    setOpenEdit(null);
+    setEditImage(null);
+  };
+
+  // Criar (modal)
   const submitCreate = async (data: FormData) => {
     try {
       if (!createImage) {
-        alert('Selecione uma imagem para criar o produto.');
+        toast.error('Selecione uma imagem para criar o produto.');
         return;
       }
+      const creating = toast.loading('Criando produto...');
       const res = await api.post<Product>('/api/products', data);
+      toast.success('Produto criado!', { id: creating });
+
+      // upload em seguida
       await onUpload(res.data.id, createImage);
+
       setOpenCreate(false);
       createForm.reset();
       setCreateImage(null);
     } catch (e) {
       console.error(e);
-      alert('Falha ao salvar produto (verifique se está logado).');
+      toast.error('Falha ao salvar produto (verifique se está logado).');
     }
   };
 
-  // B) Editar (modal)
+  // Abrir modal de edição
   const openEditModal = (p: Product) => {
     setOpenEdit(p);
+    setEditImage(null);
     editForm.reset({
       name: p.name,
       sku: p.sku,
@@ -101,22 +117,39 @@ export default function Products({ onLogout }: { onLogout: () => void }) {
     });
   };
 
+  // Editar (modal)
   const submitEdit = async (data: FormData) => {
     try {
       if (!openEdit) return;
-      await api.put(`/api/products/${openEdit.id}`, data);
-      setOpenEdit(null);
-      await load();
+      const productId = openEdit.id;
+      const t = toast.loading('Salvando alterações...');
+      await api.put(`/api/products/${productId}`, data);
+      if (editImage) {
+        await onUpload(productId, editImage);
+        setEditImage(null);
+      } else {
+        await load();
+      }
+      toast.success('Produto atualizado!', { id: t });
+      closeEditModal();
     } catch (e) {
       console.error(e);
-      alert('Falha ao editar produto.');
+      toast.error('Falha ao editar produto.');
     }
   };
 
+  // Deletar
   const onDelete = async (id: number) => {
     if (!confirm('Apagar este produto?')) return;
-    await api.delete(`/api/products/${id}`);
-    load();
+    const t = toast.loading('Excluindo...');
+    try {
+      await api.delete(`/api/products/${id}`);
+      await load();
+      toast.success('Produto excluído!', { id: t });
+    } catch (e) {
+      console.error(e);
+      toast.error('Falha ao excluir produto.', { id: t });
+    }
   };
 
   return (
@@ -148,7 +181,7 @@ export default function Products({ onLogout }: { onLogout: () => void }) {
       <ul style={{ display:'grid', gap:8, paddingLeft:0, listStyle:'none' }}>
         {filtered.map(p => (
           <li key={p.id} style={{ border:'1px solid #e5e7eb', borderRadius:8, padding:12 }}>
-            <div style={{ display:'grid', gap:8, gridTemplateColumns:'80px 1fr 1fr 1fr 1fr auto auto', alignItems:'center' }}>
+            <div style={{ display:'grid', gap:8, gridTemplateColumns:'80px 1fr 1fr 1fr 1fr auto', alignItems:'center' }}>
               <div>
                 {p.imageUrl ? (
                   <img
@@ -167,16 +200,6 @@ export default function Products({ onLogout }: { onLogout: () => void }) {
               <div>{p.sku}</div>
               <div>¥{p.price}</div>
               <div>Estoque: {p.stock}</div>
-
-              <div>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => onUpload(p.id, e.target.files?.[0] || null)}
-                  disabled={uploadingId === p.id}
-                />
-                {uploadingId === p.id && <small style={{ marginLeft: 8 }}>Enviando...</small>}
-              </div>
 
               <div style={{ display:'flex', gap:8 }}>
                 <button
@@ -257,11 +280,11 @@ export default function Products({ onLogout }: { onLogout: () => void }) {
       {/* Modal: Editar */}
       <Modal
         open={!!openEdit}
-        onClose={() => setOpenEdit(null)}
+        onClose={closeEditModal}
         title={`Editar produto${openEdit ? ` #${openEdit.id}` : ''}`}
         footer={
           <>
-            <button onClick={() => setOpenEdit(null)} style={{ padding:'8px 12px', borderRadius:8 }}>
+            <button onClick={closeEditModal} style={{ padding:'8px 12px', borderRadius:8 }}>
               Cancelar
             </button>
             <button
@@ -302,8 +325,26 @@ export default function Products({ onLogout }: { onLogout: () => void }) {
             <input {...editForm.register('stock')} inputMode="numeric" />
             {editForm.formState.errors.stock && <small style={{ color:'crimson' }}>{editForm.formState.errors.stock.message}</small>}
           </div>
-          <div style={{ fontSize: 12, color:'#555' }}>
-            A imagem pode ser alterada pela lista (input de arquivo).
+          <div>
+            <label>Imagem (opcional)</label>
+            <input type="file" accept="image/*" onChange={(e) => setEditImage(e.target.files?.[0] || null)} />
+            {editImage && (
+              <small style={{ display:'block', marginTop:6 }}>
+                Nova imagem selecionada: {editImage.name}
+              </small>
+            )}
+            {!editImage && openEdit?.imageUrl && (
+              <div style={{ marginTop: 8 }}>
+                <img
+                  src={openEdit.imageUrl}
+                  alt={openEdit.name}
+                  style={{ width: 72, height: 72, objectFit:'cover', borderRadius:8, border:'1px solid #ccc' }}
+                />
+              </div>
+            )}
+            <small style={{ display:'block', marginTop:6, color:'#555' }}>
+              A imagem atual será mantida caso nenhuma nova seja enviada.
+            </small>
           </div>
         </form>
       </Modal>
