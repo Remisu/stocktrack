@@ -12,6 +12,7 @@ model User {
   email        String   @unique
   passwordHash String
   createdAt    DateTime @default(now())
+  Log          Log[]
 }
 
 model Product {
@@ -32,4 +33,18 @@ model Sale {
   total     Decimal  @db.Decimal(10, 2)
   createdAt DateTime @default(now())
   product   Product  @relation(fields: [productId], references: [id])
+}
+
+model Log {
+  id        Int      @id @default(autoincrement())
+  userId    Int?
+  action    String // ex: "product.create" | "product.update" | "product.delete" | "product.upload"
+  entity    String? // ex: "product"
+  entityId  Int?
+  payload   Json?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([createdAt, action])
 }

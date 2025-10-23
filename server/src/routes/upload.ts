@@ -4,6 +4,7 @@ import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { s3, S3_BUCKET } from '../s3';
 import { PrismaClient } from '@prisma/client';
 import { requireAuth } from './requireAuth';
+import { logAction } from '../utils/logger';
 
 const prisma = new PrismaClient();
 const router = Router();
@@ -47,6 +48,14 @@ router.post('/api/products/:id/image', requireAuth, upload.single('file'), async
     const updated = await prisma.product.update({
       where: { id },
       data: { imageUrl: publicUrl }
+    });
+
+    await logAction({
+      reqUserId: req.user?.id,
+      action: 'product.upload',
+      entity: 'product',
+      entityId: id,
+      payload: { imageUrl: publicUrl, mimetype: req.file.mimetype, size: req.file.size },
     });
 
     return res.json({ ok: true, imageUrl: updated.imageUrl });

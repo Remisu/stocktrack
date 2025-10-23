@@ -1,19 +1,25 @@
 {
+  // TS aceita comentários aqui (JSONC)
   "compilerOptions": {
-    "module": "nodenext",
-    "target": "esnext",
-    "esModuleInterop": true,         
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+
+    "rootDir": "src",
+    "outDir": "dist",
+
+    // IMPORTANTE p/ libs CJS (multer, etc.)
+    "esModuleInterop": true,
+
     "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
     "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "jsx": "react-jsx",
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true
-  }
+
+    // Tipos globais
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types", "./src/types"]
+  },
+  "include": ["src/**/*", "src/types/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

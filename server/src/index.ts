@@ -7,6 +7,7 @@ import { PrismaClient } from '@prisma/client';
 import authRouter from './routes/auth';
 import { requireAuth } from './routes/requireAuth';
 import uploadRouter from './routes/upload';
+import { logAction } from './utils/logger';
 
 const app = express();
 app.use(cors());
@@ -43,7 +44,26 @@ app.get('/api/products', async (_req, res) => {
 app.post('/api/products', requireAuth, async (req, res) => {
   const { name, sku, price, stock } = req.body;
   const created = await prisma.product.create({ data: { name, sku, price, stock } });
+  await logAction({
+    reqUserId: req.user?.id,
+    action: 'product.create',
+    entity: 'product',
+    entityId: created.id,
+    payload: { name, sku, price, stock },
+  });
   res.status(201).json(created);
+});
+
+// === Logs (listar) ===
+app.get('/api/logs', requireAuth, async (req, res) => {
+  const take = Math.min(Number(req.query.take) || 50, 100);
+  const skip = Number(req.query.skip) || 0;
+  const logs = await prisma.log.findMany({
+    orderBy: { createdAt: 'desc' },
+    take, skip,
+    include: { user: { select: { id: true, email: true } } },
+  });
+  res.json(logs);
 });
 
 // Update product (protected)
@@ -59,6 +79,13 @@ app.put('/api/products/:id', requireAuth, async (req, res) => {
     where: { id },
     data: { name, sku, price, stock }
   });
+  await logAction({
+    reqUserId: req.user?.id,
+    action: 'product.update',
+    entity: 'product',
+    entityId: id,
+    payload: { name, sku, price, stock },
+  });
 
   return res.json(updated);
 });
@@ -68,6 +95,12 @@ app.delete('/api/products/:id', requireAuth, async (req, res) => {
   const id = Number(req.params.id);
   if (Number.isNaN(id)) return res.status(400).json({ error: 'invalid id' });
   await prisma.product.delete({ where: { id } });
+  await logAction({
+    reqUserId: req.user?.id,
+    action: 'product.delete',
+    entity: 'product',
+    entityId: id,
+  });
   return res.status(204).send();
 });
 
