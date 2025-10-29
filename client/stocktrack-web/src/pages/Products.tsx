@@ -1,16 +1,28 @@
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import { api } from '../lib/api';
-import AppLayout from '../layouts/AppLayout';
 import Modal from '../components/Modal';
 import ProductForm, { type ProductFormValues } from '../components/ProductForm';
 import ProductItem, { type Product } from '../components/ProductItem';
 
-export default function Products({ onLogout }: { onLogout: () => void }) {
+export default function Products() {
   const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState('');
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState<null | Product>(null);
+  const [editImage, setEditImage] = useState<File | null>(null);
+  const [generatedSku, setGeneratedSku] = useState('');
+
+  const createSku = () => {
+    const time = Date.now().toString(36).toUpperCase();
+    const random = Math.random().toString(36).slice(2, 6).toUpperCase();
+    return `SKU-${time}-${random}`;
+  };
+
+  const handleOpenCreate = () => {
+    setGeneratedSku(createSku());
+    setOpenCreate(true);
+  };
 
   const load = async () => {
     try {
@@ -54,10 +66,15 @@ export default function Products({ onLogout }: { onLogout: () => void }) {
         return;
       }
       const creating = toast.loading('Criando produto...');
-      const res = await api.post<Product>('/api/products', values);
+      const payload = {
+        ...values,
+        sku: values.sku?.trim() || generatedSku || createSku(),
+      };
+      const res = await api.post<Product>('/api/products', payload);
       await handleUpload(res.data.id, file);
       toast.success('Produto criado!', { id: creating });
       setOpenCreate(false);
+      setGeneratedSku('');
       await load();
     } catch (e) {
       console.error(e);
@@ -70,8 +87,14 @@ export default function Products({ onLogout }: { onLogout: () => void }) {
     const t = toast.loading('Salvando alterações...');
     try {
       await api.put(`/api/products/${openEdit.id}`, values);
+      if (editImage) {
+        const form = new FormData();
+        form.append('file', editImage);
+        await api.post(`/api/products/${openEdit.id}/image`, form);
+      }
       toast.success('Produto atualizado!', { id: t });
       setOpenEdit(null);
+      setEditImage(null);
       await load();
     } catch (e) {
       console.error(e);
@@ -93,11 +116,11 @@ export default function Products({ onLogout }: { onLogout: () => void }) {
   };
 
   return (
-    <AppLayout onLogout={onLogout}>
+    <>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: 14 }}>
         <h2 style={{ margin: 0 }}>Produtos</h2>
         <button
-          onClick={() => setOpenCreate(true)}
+          onClick={handleOpenCreate}
           style={{ background:'#2563eb', color:'#fff', border:'none', padding:'8px 12px', borderRadius:8, fontWeight:600 }}
         >
           Cadastrar
@@ -130,21 +153,33 @@ export default function Products({ onLogout }: { onLogout: () => void }) {
       {/* Modal: Cadastrar */}
       <Modal
         open={openCreate}
-        onClose={() => setOpenCreate(false)}
+        onClose={() => {
+          setOpenCreate(false);
+          setGeneratedSku('');
+        }}
         title="Cadastrar produto"
       >
         <ProductForm
           submitLabel="Cadastrar"
           requireImage
+          lockSku
+          skuNote="SKU gerado automaticamente."
+          defaultValues={{ sku: generatedSku }}
           onSubmit={handleCreate}
-          onCancel={() => setOpenCreate(false)}
+          onCancel={() => {
+            setOpenCreate(false);
+            setGeneratedSku('');
+          }}
         />
       </Modal>
 
       {/* Modal: Editar (+ upload de imagem dentro do modal) */}
       <Modal
         open={!!openEdit}
-        onClose={() => setOpenEdit(null)}
+        onClose={() => {
+          setOpenEdit(null);
+          setEditImage(null);
+        }}
         title={`Editar produto${openEdit ? ` #${openEdit.id}` : ''}`}
       >
         {openEdit && (
@@ -154,27 +189,49 @@ export default function Products({ onLogout }: { onLogout: () => void }) {
               defaultValues={{
                 name: openEdit.name,
                 sku: openEdit.sku,
-                price: Number(openEdit.price as any),
+                price: Number(openEdit.price),
                 stock: openEdit.stock,
               }}
               onSubmit={handleEdit}
-              onCancel={() => setOpenEdit(null)}
+              onCancel={() => { setOpenEdit(null); setEditImage(null); }}
             />
 
             <div style={{ marginTop: 16 }}>
               <label>Alterar imagem:</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file && openEdit) handleUpload(openEdit.id, file);
-                }}
-              />
+              <div style={{ display:'flex', gap:12, alignItems:'center', marginTop:8 }}>
+                <div>
+                  {/* Preview da nova imagem OU imagem atual */}
+                  {editImage ? (
+                    <img
+                      src={URL.createObjectURL(editImage)}
+                      alt="preview"
+                      style={{ width:72, height:72, objectFit:'cover', borderRadius:8, border:'1px solid #ccc' }}
+                    />
+                  ) : openEdit.imageUrl ? (
+                    <img
+                      src={openEdit.imageUrl}
+                      alt={openEdit.name}
+                      style={{ width:72, height:72, objectFit:'cover', borderRadius:8, border:'1px solid #ccc' }}
+                    />
+                  ) : (
+                    <div style={{ width:72, height:72, border:'1px dashed #ccc', borderRadius:8,
+                      display:'flex', alignItems:'center', justifyContent:'center', color:'#888', fontSize:12 }}>
+                      sem imagem
+                    </div>
+                  )}
+                </div>
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setEditImage(e.target.files?.[0] || null)}
+                />
+              </div>
+              <small style={{ color:'#555' }}>A imagem será enviada ao clicar em <strong>Salvar</strong>.</small>
             </div>
           </>
         )}
       </Modal>
-    </AppLayout>
+    </>
   );
 }

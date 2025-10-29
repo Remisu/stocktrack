@@ -19,6 +19,10 @@ type Props = {
   loading?: boolean;
   /** Mostra input de imagem e exige arquivo (para criar) */
   requireImage?: boolean;
+  /** Torna o campo SKU somente leitura (usado quando gerado automaticamente) */
+  lockSku?: boolean;
+  /** Mensagem opcional abaixo do campo SKU */
+  skuNote?: string;
 };
 
 export default function ProductForm({
@@ -28,9 +32,11 @@ export default function ProductForm({
   onCancel,
   loading,
   requireImage,
+  lockSku,
+  skuNote,
 }: Props) {
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(schema) as any,
     defaultValues: {
       name: defaultValues?.name ?? '',
       sku: defaultValues?.sku ?? '',
@@ -41,7 +47,7 @@ export default function ProductForm({
 
   const [file, setFile] = useState<File | null>(null);
 
-  const handleSubmit = form.handleSubmit(async (values) => {
+  const handleSubmit = form.handleSubmit(async (values: ProductFormValues) => {
     if (requireImage && !file) {
       form.setError('name', { message: 'Selecione uma imagem antes de salvar.' });
       return;
@@ -61,9 +67,16 @@ export default function ProductForm({
 
       <div>
         <label>SKU</label>
-        <input {...form.register('sku')} />
+        <input
+          {...form.register('sku')}
+          readOnly={lockSku}
+          style={lockSku ? { background: '#f1f5f9', cursor: 'not-allowed' } : undefined}
+        />
         {form.formState.errors.sku && (
           <small style={{ color: 'crimson' }}>{form.formState.errors.sku.message}</small>
+        )}
+        {skuNote && !form.formState.errors.sku && (
+          <small style={{ color: '#475569' }}>{skuNote}</small>
         )}
       </div>
 

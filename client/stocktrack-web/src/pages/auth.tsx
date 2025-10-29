@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '../lib/api';
 import { setToken } from '../lib/auth';
+import toast from 'react-hot-toast';
 
 const registerSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -21,17 +22,36 @@ export default function Auth({ onDone }: { onDone: () => void }) {
   const logForm = useForm<LoginForm>({ resolver: zodResolver(loginSchema) });
 
   const handleRegister = async (data: RegisterForm) => {
-    await api.post('/api/auth/register', data);
-    // após registrar, já faz login
-    const res = await api.post('/api/auth/login', data);
-    setToken(res.data.token);
-    onDone();
+    const t = toast.loading('Registrando conta...');
+    try {
+      await api.post('/api/auth/register', data);
+      const res = await api.post('/api/auth/login', data);
+      setToken(res.data.token);
+      toast.success('Conta criada com sucesso!', { id: t });
+      onDone();
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.error ??
+        err?.response?.data?.message ??
+        'Falha ao registrar. Verifique os dados informados.';
+      toast.error(msg, { id: t });
+    }
   };
 
   const handleLogin = async (data: LoginForm) => {
-    const res = await api.post('/api/auth/login', data);
-    setToken(res.data.token);
-    onDone();
+    const t = toast.loading('Autenticando...');
+    try {
+      const res = await api.post('/api/auth/login', data);
+      setToken(res.data.token);
+      toast.success('Login efetuado!', { id: t });
+      onDone();
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.error ??
+        err?.response?.data?.message ??
+        'Login não autorizado. Confira e-mail e senha.';
+      toast.error(msg, { id: t });
+    }
   };
 
   return (
