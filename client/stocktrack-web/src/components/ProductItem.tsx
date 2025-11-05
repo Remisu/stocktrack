@@ -52,7 +52,7 @@ export default function ProductItem({
                 fontSize: 12,
               }}
             >
-              sem imagem
+              no image
             </div>
           )}
         </div>
@@ -62,18 +62,18 @@ export default function ProductItem({
         </div>
         <div>{p.sku}</div>
         <div>¥{p.price}</div>
-        <div>Estoque: {p.stock}</div>
+        <div>Stock: {p.stock}</div>
 
         <div style={{ display: 'flex', gap: 8 }}>
           <button
             onClick={() => onEdit(p)}
             style={{ background: '#0ea5e9', color: '#fff', border: 'none', padding: '6px 10px', borderRadius: 6 }}
           >
-            Editar
+            Edit
           </button>
           <button
             onClick={() => onDelete(p.id)}
-            title="Excluir"
+            title="Delete"
             style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 18 }}
           >
             🗑️

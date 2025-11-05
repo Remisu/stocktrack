@@ -42,7 +42,7 @@ router.post('/api/products/:id/image', requireAuth, upload.single('file'), async
       ContentType: req.file.mimetype
     }));
 
-    // Gera URL pública do objeto
+    // Generate public URL for the object
     const publicUrl = `${process.env.S3_ENDPOINT?.replace('9000', '9000')}/${S3_BUCKET}/${key}`;
 
     const updated = await prisma.product.update({

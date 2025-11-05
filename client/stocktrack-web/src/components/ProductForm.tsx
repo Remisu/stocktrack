@@ -4,10 +4,10 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 const schema = z.object({
-  name: z.string().min(1, 'Nome obrigatório'),
-  sku: z.string().min(1, 'SKU obrigatório'),
-  price: z.coerce.number().positive('Preço deve ser > 0'),
-  stock: z.coerce.number().int('Número inteiro').nonnegative('>= 0'),
+  name: z.string().min(1, 'Name is required'),
+  sku: z.string().min(1, 'SKU is required'),
+  price: z.coerce.number().positive('Price must be > 0'),
+  stock: z.coerce.number().int('Must be an integer').nonnegative('Must be >= 0'),
 });
 export type ProductFormValues = z.infer<typeof schema>;
 
@@ -17,11 +17,11 @@ type Props = {
   onSubmit: (values: ProductFormValues, file?: File | null) => Promise<void> | void;
   onCancel?: () => void;
   loading?: boolean;
-  /** Mostra input de imagem e exige arquivo (para criar) */
+  /** Shows image input and requires a file (used on create) */
   requireImage?: boolean;
-  /** Torna o campo SKU somente leitura (usado quando gerado automaticamente) */
+  /** Makes the SKU field read-only (used when auto-generated) */
   lockSku?: boolean;
-  /** Mensagem opcional abaixo do campo SKU */
+  /** Optional helper text below the SKU field */
   skuNote?: string;
 };
 
@@ -49,7 +49,7 @@ export default function ProductForm({
 
   const handleSubmit = form.handleSubmit(async (values: ProductFormValues) => {
     if (requireImage && !file) {
-      form.setError('name', { message: 'Selecione uma imagem antes de salvar.' });
+      form.setError('name', { message: 'Select an image before saving.' });
       return;
     }
     await onSubmit(values, file);
@@ -58,7 +58,7 @@ export default function ProductForm({
   return (
     <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 10 }}>
       <div>
-        <label>Nome</label>
+        <label>Name</label>
         <input {...form.register('name')} />
         {form.formState.errors.name && (
           <small style={{ color: 'crimson' }}>{form.formState.errors.name.message}</small>
@@ -81,16 +81,16 @@ export default function ProductForm({
       </div>
 
       <div>
-        <label>Preço</label>
+        <label>Price</label>
         <input
           {...form.register('price')}
           inputMode="decimal"
           onInput={(e) => {
             const t = e.currentTarget;
-            // só números, ponto e vírgula; vírgula vira ponto
+            // allow only digits, dot, comma; convert comma to dot
             t.value = t.value.replace(/[^0-9.,]/g, '').replace(',', '.');
           }}
-          placeholder="ex: 19.90"
+          placeholder="e.g. 19.90"
         />
         {form.formState.errors.price && (
           <small style={{ color: 'crimson' }}>{form.formState.errors.price.message}</small>
@@ -98,11 +98,11 @@ export default function ProductForm({
       </div>
 
       <div>
-        <label>Estoque</label>
+        <label>Stock</label>
         <input
           {...form.register('stock')}
           inputMode="numeric"
-          placeholder="ex: 10"
+          placeholder="e.g. 10"
         />
         {form.formState.errors.stock && (
           <small style={{ color: 'crimson' }}>{form.formState.errors.stock.message}</small>
@@ -111,7 +111,7 @@ export default function ProductForm({
 
       {requireImage && (
         <div>
-          <label>Imagem (obrigatória)</label>
+          <label>Image (required)</label>
           <input
             type="file"
             accept="image/*"
@@ -123,7 +123,7 @@ export default function ProductForm({
       <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 6 }}>
         {onCancel && (
           <button type="button" onClick={onCancel} style={{ padding: '8px 12px', borderRadius: 8 }}>
-            Cancelar
+            Cancel
           </button>
         )}
         <button
@@ -138,7 +138,7 @@ export default function ProductForm({
             opacity: loading || form.formState.isSubmitting ? 0.7 : 1,
           }}
         >
-          {loading || form.formState.isSubmitting ? 'Salvando...' : submitLabel}
+          {loading || form.formState.isSubmitting ? 'Saving...' : submitLabel}
         </button>
       </div>
     </form>

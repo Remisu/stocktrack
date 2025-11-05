@@ -4,7 +4,7 @@ import { clearToken } from './auth';
 
 export const api = axios.create({});
 
-// Anexa o Bearer token (se existir)
+// Attach Bearer token if present
 api.interceptors.request.use((config) => {
   const token = getToken();
   if (token) {
@@ -19,7 +19,7 @@ api.interceptors.response.use(
   (err) => {
     if (err?.response?.status === 401) {
       clearToken();
-      // força voltar para tela Auth
+      // force returning to the Auth screen
       window.location.reload();
     }
     return Promise.reject(err);

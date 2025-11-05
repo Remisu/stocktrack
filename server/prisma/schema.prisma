@@ -21,7 +21,7 @@ model Product {
   sku       String   @unique
   price     Decimal  @db.Decimal(10, 2)
   stock     Int      @default(0)
-  imageUrl  String? // <-- este campo precisa existir
+  imageUrl  String? // <-- this field must exist
   createdAt DateTime @default(now())
   Sale      Sale[]
 }
@@ -38,8 +38,8 @@ model Sale {
 model Log {
   id        Int      @id @default(autoincrement())
   userId    Int?
-  action    String // ex: "product.create" | "product.update" | "product.delete" | "product.upload"
-  entity    String? // ex: "product"
+  action    String // e.g.: "product.create" | "product.update" | "product.delete" | "product.upload"
+  entity    String? // e.g.: "product"
   entityId  Int?
   payload   Json?
   createdAt DateTime @default(now())

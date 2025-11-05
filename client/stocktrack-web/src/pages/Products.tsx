@@ -30,7 +30,7 @@ export default function Products() {
       setProducts(data);
     } catch (e) {
       console.error(e);
-      toast.error('Falha ao carregar produtos.');
+      toast.error('Failed to load products.');
     }
   };
 
@@ -46,45 +46,45 @@ export default function Products() {
   }, [products, query]);
 
   const handleUpload = async (id: number, file: File) => {
-    const t = toast.loading('Enviando imagem...');
+    const t = toast.loading('Uploading image...');
     try {
       const form = new FormData();
       form.append('file', file);
       await api.post(`/api/products/${id}/image`, form);
       await load();
-      toast.success('Imagem enviada!', { id: t });
+      toast.success('Image uploaded!', { id: t });
     } catch (e) {
       console.error(e);
-      toast.error('Falha no upload (login/tamanho/tipo?)', { id: t });
+      toast.error('Upload failed (check auth/size/type?)', { id: t });
     }
   };
 
   const handleCreate = async (values: ProductFormValues, file?: File | null) => {
     try {
       if (!file) {
-        toast.error('Selecione uma imagem para criar o produto.');
+        toast.error('Select an image before creating the product.');
         return;
       }
-      const creating = toast.loading('Criando produto...');
+      const creating = toast.loading('Creating product...');
       const payload = {
         ...values,
         sku: values.sku?.trim() || generatedSku || createSku(),
       };
       const res = await api.post<Product>('/api/products', payload);
       await handleUpload(res.data.id, file);
-      toast.success('Produto criado!', { id: creating });
+      toast.success('Product created!', { id: creating });
       setOpenCreate(false);
       setGeneratedSku('');
       await load();
     } catch (e) {
       console.error(e);
-      toast.error('Falha ao criar produto.');
+      toast.error('Failed to create product.');
     }
   };
 
   const handleEdit = async (values: ProductFormValues) => {
     if (!openEdit) return;
-    const t = toast.loading('Salvando alterações...');
+    const t = toast.loading('Saving changes...');
     try {
       await api.put(`/api/products/${openEdit.id}`, values);
       if (editImage) {
@@ -92,50 +92,50 @@ export default function Products() {
         form.append('file', editImage);
         await api.post(`/api/products/${openEdit.id}/image`, form);
       }
-      toast.success('Produto atualizado!', { id: t });
+      toast.success('Product updated!', { id: t });
       setOpenEdit(null);
       setEditImage(null);
       await load();
     } catch (e) {
       console.error(e);
-      toast.error('Falha ao editar produto.', { id: t });
+      toast.error('Failed to update product.', { id: t });
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Apagar este produto?')) return;
-    const t = toast.loading('Excluindo...');
+    if (!confirm('Delete this product?')) return;
+    const t = toast.loading('Deleting...');
     try {
       await api.delete(`/api/products/${id}`);
-      toast.success('Produto excluído!', { id: t });
+      toast.success('Product deleted!', { id: t });
       await load();
     } catch (e) {
       console.error(e);
-      toast.error('Falha ao excluir produto.', { id: t });
+      toast.error('Failed to delete product.', { id: t });
     }
   };
 
   return (
     <>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: 14 }}>
-        <h2 style={{ margin: 0 }}>Produtos</h2>
+        <h2 style={{ margin: 0 }}>Products</h2>
         <button
           onClick={handleOpenCreate}
           style={{ background:'#2563eb', color:'#fff', border:'none', padding:'8px 12px', borderRadius:8, fontWeight:600 }}
         >
-          Cadastrar
+          Create
         </button>
       </div>
 
       <div style={{ display:'flex', gap:8, marginBottom: 16, maxWidth: 600 }}>
         <input
-          placeholder="Buscar por nome ou SKU..."
+          placeholder="Search by name or SKU..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           style={{ flex: 1 }}
         />
         <button onClick={() => setQuery('')} disabled={!query.trim()}>
-          Limpar
+          Clear
         </button>
       </div>
 
@@ -150,20 +150,20 @@ export default function Products() {
         ))}
       </ul>
 
-      {/* Modal: Cadastrar */}
+      {/* Modal: Create */}
       <Modal
         open={openCreate}
         onClose={() => {
           setOpenCreate(false);
           setGeneratedSku('');
         }}
-        title="Cadastrar produto"
+        title="Create product"
       >
         <ProductForm
-          submitLabel="Cadastrar"
+          submitLabel="Create"
           requireImage
           lockSku
-          skuNote="SKU gerado automaticamente."
+          skuNote="SKU generated automatically."
           defaultValues={{ sku: generatedSku }}
           onSubmit={handleCreate}
           onCancel={() => {
@@ -173,19 +173,19 @@ export default function Products() {
         />
       </Modal>
 
-      {/* Modal: Editar (+ upload de imagem dentro do modal) */}
+      {/* Modal: Edit (+ image upload within the modal) */}
       <Modal
         open={!!openEdit}
         onClose={() => {
           setOpenEdit(null);
           setEditImage(null);
         }}
-        title={`Editar produto${openEdit ? ` #${openEdit.id}` : ''}`}
+        title={`Edit product${openEdit ? ` #${openEdit.id}` : ''}`}
       >
         {openEdit && (
           <>
             <ProductForm
-              submitLabel="Salvar"
+              submitLabel="Save"
               defaultValues={{
                 name: openEdit.name,
                 sku: openEdit.sku,
@@ -197,10 +197,10 @@ export default function Products() {
             />
 
             <div style={{ marginTop: 16 }}>
-              <label>Alterar imagem:</label>
+              <label>Change image:</label>
               <div style={{ display:'flex', gap:12, alignItems:'center', marginTop:8 }}>
                 <div>
-                  {/* Preview da nova imagem OU imagem atual */}
+                  {/* Preview new image OR current image */}
                   {editImage ? (
                     <img
                       src={URL.createObjectURL(editImage)}
@@ -216,7 +216,7 @@ export default function Products() {
                   ) : (
                     <div style={{ width:72, height:72, border:'1px dashed #ccc', borderRadius:8,
                       display:'flex', alignItems:'center', justifyContent:'center', color:'#888', fontSize:12 }}>
-                      sem imagem
+                      no image
                     </div>
                   )}
                 </div>
@@ -227,7 +227,7 @@ export default function Products() {
                   onChange={(e) => setEditImage(e.target.files?.[0] || null)}
                 />
               </div>
-              <small style={{ color:'#555' }}>A imagem será enviada ao clicar em <strong>Salvar</strong>.</small>
+              <small style={{ color:'#555' }}>The image will be uploaded when you click <strong>Save</strong>.</small>
             </div>
           </>
         )}

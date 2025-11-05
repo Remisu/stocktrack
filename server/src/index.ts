@@ -54,7 +54,7 @@ app.post('/api/products', requireAuth, async (req, res) => {
   res.status(201).json(created);
 });
 
-// === Logs (listar) ===
+// === Logs (list) ===
 app.get('/api/logs', requireAuth, async (req, res) => {
   const take = Math.min(Number(req.query.take) || 50, 100);
   const skip = Number(req.query.skip) || 0;

@@ -39,8 +39,8 @@ export default function Modal({ open, title, children, footer, onClose, width = 
         onMouseDown={(e) => e.stopPropagation()}
         style={{
           width, maxWidth: '95vw',
-          background: '#ffffff',           // fundo claro
-          color: '#0f172a',                // texto escuro
+          background: '#ffffff',           // light background
+          color: '#0f172a',                // dark text
           borderRadius: 12,
           boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
         }}
@@ -49,10 +49,10 @@ export default function Modal({ open, title, children, footer, onClose, width = 
           padding: '14px 18px',
           borderBottom: '1px solid #eee',
           display:'flex', alignItems:'center', justifyContent:'space-between',
-          color: '#0f172a'                 // título escuro
+          color: '#0f172a'                 // dark title
         }}>
           <strong style={{ fontSize: 16 }}>{title}</strong>
-          <button onClick={onClose} aria-label="Fechar"
+          <button onClick={onClose} aria-label="Close"
             style={{ background:'transparent', border:'none', fontSize:20, cursor:'pointer', color:'#0f172a' }}>×</button>
         </div>
 

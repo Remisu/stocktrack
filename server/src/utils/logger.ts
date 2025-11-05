@@ -22,6 +22,6 @@ export async function logAction(input: LogInput) {
       },
     });
   } catch (e) {
-    console.error('Log error:', e); // não derruba a request por falha de log
+    console.error('Log error:', e); // do not fail the request because logging failed
   }
 }

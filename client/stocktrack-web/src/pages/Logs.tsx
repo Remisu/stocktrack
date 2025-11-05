@@ -19,7 +19,7 @@ const NO_USER_KEY = '__no_user__';
 
 const formatDateTime = (iso: string) => {
   try {
-    return new Date(iso).toLocaleString('pt-BR', {
+    return new Date(iso).toLocaleString('en-US', {
       dateStyle: 'short',
       timeStyle: 'medium',
     });
@@ -44,7 +44,7 @@ export default function Logs() {
       const msg =
         err?.response?.data?.error ??
         err?.response?.data?.message ??
-        'Não foi possível carregar os logs.';
+        'Could not load logs.';
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -63,7 +63,7 @@ export default function Logs() {
     const result = new Map<string, string>();
     logs.forEach((log) => {
       const key = log.user?.email ?? NO_USER_KEY;
-      const label = log.user?.email ?? 'Sem usuário';
+      const label = log.user?.email ?? 'No user';
       if (!result.has(key)) {
         result.set(key, label);
       }
@@ -112,15 +112,15 @@ export default function Logs() {
             cursor: loading ? 'wait' : 'pointer',
           }}
         >
-          {loading ? 'Atualizando...' : 'Recarregar'}
+          {loading ? 'Refreshing...' : 'Reload'}
         </button>
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
         <label style={{ display: 'grid', gap: 4 }}>
-          <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>Ação</span>
+          <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>Action</span>
           <select value={actionFilter} onChange={(e) => setActionFilter(e.target.value)}>
-            <option value="">Todas</option>
+            <option value="">All</option>
             {uniqueActions.map((action) => (
               <option key={action} value={action}>
                 {action}
@@ -130,9 +130,9 @@ export default function Logs() {
         </label>
 
         <label style={{ display: 'grid', gap: 4 }}>
-          <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>Usuário</span>
+          <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>User</span>
           <select value={userFilter} onChange={(e) => setUserFilter(e.target.value)}>
-            <option value="">Todos</option>
+            <option value="">All</option>
             {uniqueUsers.map(([key, label]) => (
               <option key={key} value={key}>
                 {label}
@@ -142,7 +142,7 @@ export default function Logs() {
         </label>
 
         <label style={{ display: 'grid', gap: 4 }}>
-          <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>Data</span>
+          <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>Date</span>
           <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} />
         </label>
 
@@ -159,24 +159,24 @@ export default function Logs() {
               cursor: 'pointer',
             }}
           >
-            Limpar filtros
+            Clear filters
           </button>
         )}
       </div>
 
       {loading && logs.length === 0 ? (
-        <p>Carregando logs...</p>
+        <p>Loading logs...</p>
       ) : filteredLogs.length === 0 ? (
-        <p>Nenhum log encontrado com os filtros atuais.</p>
+        <p>No logs found for the current filters.</p>
       ) : (
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
             <thead>
               <tr style={{ textAlign: 'left', background: '#f1f5f9' }}>
-                <th style={{ padding: '10px 12px', borderBottom: '1px solid #e2e8f0' }}>Ação</th>
-                <th style={{ padding: '10px 12px', borderBottom: '1px solid #e2e8f0' }}>Usuário</th>
-                <th style={{ padding: '10px 12px', borderBottom: '1px solid #e2e8f0' }}>Horário</th>
-                <th style={{ padding: '10px 12px', borderBottom: '1px solid #e2e8f0' }}>Detalhes</th>
+                <th style={{ padding: '10px 12px', borderBottom: '1px solid #e2e8f0' }}>Action</th>
+                <th style={{ padding: '10px 12px', borderBottom: '1px solid #e2e8f0' }}>User</th>
+                <th style={{ padding: '10px 12px', borderBottom: '1px solid #e2e8f0' }}>Timestamp</th>
+                <th style={{ padding: '10px 12px', borderBottom: '1px solid #e2e8f0' }}>Details</th>
               </tr>
             </thead>
             <tbody>

@@ -1,5 +1,5 @@
 {
-  // TS aceita comentários aqui (JSONC)
+  // TS accepts comments here (JSONC)
   "compilerOptions": {
     "target": "ES2020",
     "module": "NodeNext",
@@ -8,7 +8,7 @@
     "rootDir": "src",
     "outDir": "dist",
 
-    // IMPORTANTE p/ libs CJS (multer, etc.)
+    // IMPORTANT for CJS libs (multer, etc.)
     "esModuleInterop": true,
 
     "strict": true,
@@ -16,7 +16,7 @@
     "resolveJsonModule": true,
     "sourceMap": true,
 
-    // Tipos globais
+    // Global types
     "types": ["node"],
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },

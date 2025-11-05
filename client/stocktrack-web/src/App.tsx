@@ -13,7 +13,7 @@ export default function App() {
     setAuthed(isAuthenticated());
   }, []);
 
-  const onDoneAuth = () => {
+  const handleLogin = () => {
     setAuthed(true);
     setActivePage('products');
   };
@@ -24,11 +24,11 @@ export default function App() {
   };
 
   if (!authed) {
-    return <Auth onDone={onDoneAuth} />;
+    return <Auth onLogin={handleLogin} />;
   }
 
   const menuItems = [
-    { key: 'products', label: 'Produtos' },
+    { key: 'products', label: 'Products' },
     { key: 'logs', label: 'Logs' },
   ] as const;
 

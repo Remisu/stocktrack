@@ -46,4 +46,28 @@ router.post('/api/auth/login', async (req, res) => {
   }
 });
 
+router.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    const { email, password: newPassword } = req.body as { email?: string; password?: string };
+    if (!email || !newPassword) {
+      return res.status(400).json({ error: 'email and password are required' });
+    }
+
+    if (newPassword.length < 4) {
+      return res.status(400).json({ error: 'password too short' });
+    }
+
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) return res.status(404).json({ error: 'user not found' });
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({ where: { email }, data: { passwordHash } });
+
+    return res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: 'internal error' });
+  }
+});
+
 export default router;
