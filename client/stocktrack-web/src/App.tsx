@@ -4,6 +4,7 @@ import Products from './pages/Products';
 import Logs from './pages/Logs';
 import AppLayout from './layouts/AppLayout';
 import { clearToken, isAuthenticated } from './lib/auth';
+import ThemeToggle from './components/ThemeToggle';
 
 export default function App() {
   const [authed, setAuthed] = useState<boolean>(false);
@@ -22,10 +23,6 @@ export default function App() {
     setAuthed(false);
     setActivePage('products');
   };
-
-  if (!authed) {
-    return <Auth onLogin={handleLogin} />;
-  }
 
   const menuItems = [
     { key: 'products', label: 'Products' },
@@ -49,13 +46,20 @@ export default function App() {
   }
 
   return (
-    <AppLayout
-      onLogout={onLogout}
-      menuItems={menuItems}
-      activeKey={activePage}
-      onSelect={handleSelect}
-    >
-      {content}
-    </AppLayout>
+    <>
+      <ThemeToggle variant="floating" />
+      {authed ? (
+        <AppLayout
+          onLogout={onLogout}
+          menuItems={menuItems}
+          activeKey={activePage}
+          onSelect={handleSelect}
+        >
+          {content}
+        </AppLayout>
+      ) : (
+        <Auth onLogin={handleLogin} />
+      )}
+    </>
   );
 }

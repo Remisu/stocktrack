@@ -1,5 +1,3 @@
-import { } from 'react';
-
 export type Product = {
   id: number;
   name: string;
@@ -15,67 +13,28 @@ type Props = {
   onDelete: (id: number) => void | Promise<void>;
 };
 
-export default function ProductItem({
-  product: p,
-  onEdit,
-  onDelete,
-}: Props) {
-
+export default function ProductItem({ product: p, onEdit, onDelete }: Props) {
   return (
-    <li style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 12 }}>
-      <div
-        style={{
-          display: 'grid',
-          gap: 8,
-          gridTemplateColumns: '80px 1fr 1fr 1fr 1fr auto',
-          alignItems: 'center',
-        }}
-      >
-        <div>
+    <li className="product-item">
+      <div className="product-item__grid">
+        <div className="product-item__media">
           {p.imageUrl ? (
-            <img
-              src={p.imageUrl}
-              alt={p.name}
-              style={{ width: 72, height: 72, objectFit: 'cover', borderRadius: 8, border: '1px solid #ccc' }}
-            />
+            <img src={p.imageUrl} alt={p.name} />
           ) : (
-            <div
-              style={{
-                width: 72,
-                height: 72,
-                border: '1px dashed #ccc',
-                borderRadius: 8,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#888',
-                fontSize: 12,
-              }}
-            >
-              no image
-            </div>
+            <div className="product-item__placeholder">no image</div>
           )}
         </div>
-
-        <div>
+        <div className="product-item__name">
           <strong>{p.name}</strong>
         </div>
-        <div>{p.sku}</div>
-        <div>¥{p.price}</div>
-        <div>Stock: {p.stock}</div>
-
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button
-            onClick={() => onEdit(p)}
-            style={{ background: '#0ea5e9', color: '#fff', border: 'none', padding: '6px 10px', borderRadius: 6 }}
-          >
+        <div className="product-item__sku">{p.sku}</div>
+        <div className="product-item__price">¥{p.price}</div>
+        <div className="product-item__stock">Stock: {p.stock}</div>
+        <div className="product-item__actions">
+          <button className="primary-button" onClick={() => onEdit(p)}>
             Edit
           </button>
-          <button
-            onClick={() => onDelete(p.id)}
-            title="Delete"
-            style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 18 }}
-          >
+          <button className="icon-button" onClick={() => onDelete(p.id)} title="Delete">
             🗑️
           </button>
         </div>

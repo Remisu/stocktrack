@@ -117,29 +117,25 @@ export default function Products() {
 
   return (
     <>
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: 14 }}>
-        <h2 style={{ margin: 0 }}>Products</h2>
-        <button
-          onClick={handleOpenCreate}
-          style={{ background:'#2563eb', color:'#fff', border:'none', padding:'8px 12px', borderRadius:8, fontWeight:600 }}
-        >
+      <div className="products-header">
+        <h2>Products</h2>
+        <button className="primary-button" onClick={handleOpenCreate}>
           Create
         </button>
       </div>
 
-      <div style={{ display:'flex', gap:8, marginBottom: 16, maxWidth: 600 }}>
+      <div className="products-filters">
         <input
           placeholder="Search by name or SKU..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          style={{ flex: 1 }}
         />
-        <button onClick={() => setQuery('')} disabled={!query.trim()}>
+        <button className="secondary-button" onClick={() => setQuery('')} disabled={!query.trim()}>
           Clear
         </button>
       </div>
 
-      <ul style={{ display:'grid', gap:8, paddingLeft:0, listStyle:'none' }}>
+      <ul className="products-list">
         {filtered.map(p => (
           <ProductItem
             key={p.id}
@@ -158,6 +154,7 @@ export default function Products() {
           setGeneratedSku('');
         }}
         title="Create product"
+        width={720}
       >
         <ProductForm
           submitLabel="Create"
@@ -181,6 +178,7 @@ export default function Products() {
           setEditImage(null);
         }}
         title={`Edit product${openEdit ? ` #${openEdit.id}` : ''}`}
+        width={720}
       >
         {openEdit && (
           <>
@@ -198,24 +196,24 @@ export default function Products() {
 
             <div style={{ marginTop: 16 }}>
               <label>Change image:</label>
-              <div style={{ display:'flex', gap:12, alignItems:'center', marginTop:8 }}>
+              <div style={{ display:'flex', gap:12, alignItems:'center', marginTop:8, flexWrap:'wrap' }}>
                 <div>
                   {/* Preview new image OR current image */}
                   {editImage ? (
                     <img
                       src={URL.createObjectURL(editImage)}
                       alt="preview"
-                      style={{ width:72, height:72, objectFit:'cover', borderRadius:8, border:'1px solid #ccc' }}
+                      style={{ width:72, height:72, objectFit:'cover', borderRadius:8, border:'1px solid var(--color-border)' }}
                     />
                   ) : openEdit.imageUrl ? (
                     <img
                       src={openEdit.imageUrl}
                       alt={openEdit.name}
-                      style={{ width:72, height:72, objectFit:'cover', borderRadius:8, border:'1px solid #ccc' }}
+                      style={{ width:72, height:72, objectFit:'cover', borderRadius:8, border:'1px solid var(--color-border)' }}
                     />
                   ) : (
-                    <div style={{ width:72, height:72, border:'1px dashed #ccc', borderRadius:8,
-                      display:'flex', alignItems:'center', justifyContent:'center', color:'#888', fontSize:12 }}>
+                    <div style={{ width:72, height:72, border:'1px dashed var(--color-border)', borderRadius:8,
+                      display:'flex', alignItems:'center', justifyContent:'center', color:'var(--color-text-muted)', fontSize:12 }}>
                       no image
                     </div>
                   )}
@@ -227,7 +225,7 @@ export default function Products() {
                   onChange={(e) => setEditImage(e.target.files?.[0] || null)}
                 />
               </div>
-              <small style={{ color:'#555' }}>The image will be uploaded when you click <strong>Save</strong>.</small>
+              <small style={{ color:'var(--color-text-muted)' }}>The image will be uploaded when you click <strong>Save</strong>.</small>
             </div>
           </>
         )}

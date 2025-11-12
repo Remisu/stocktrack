@@ -97,27 +97,15 @@ export default function Logs() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <div className="logs-header">
         <h2 style={{ margin: 0 }}>Logs</h2>
-        <button
-          onClick={loadLogs}
-          disabled={loading}
-          style={{
-            background: '#0ea5e9',
-            color: '#fff',
-            border: 'none',
-            padding: '8px 12px',
-            borderRadius: 8,
-            fontWeight: 600,
-            cursor: loading ? 'wait' : 'pointer',
-          }}
-        >
+        <button className="primary-button" onClick={loadLogs} disabled={loading}>
           {loading ? 'Refreshing...' : 'Reload'}
         </button>
       </div>
 
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginBottom: 20 }}>
-        <label style={{ display: 'grid', gap: 4 }}>
+      <div className="logs-filters">
+        <label>
           <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>Action</span>
           <select value={actionFilter} onChange={(e) => setActionFilter(e.target.value)}>
             <option value="">All</option>
@@ -129,7 +117,7 @@ export default function Logs() {
           </select>
         </label>
 
-        <label style={{ display: 'grid', gap: 4 }}>
+        <label>
           <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>User</span>
           <select value={userFilter} onChange={(e) => setUserFilter(e.target.value)}>
             <option value="">All</option>
@@ -141,24 +129,13 @@ export default function Logs() {
           </select>
         </label>
 
-        <label style={{ display: 'grid', gap: 4 }}>
+        <label>
           <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 }}>Date</span>
           <input type="date" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} />
         </label>
 
         {(actionFilter || userFilter || dateFilter) && (
-          <button
-            type="button"
-            onClick={clearFilters}
-            style={{
-              alignSelf: 'end',
-              padding: '8px 12px',
-              borderRadius: 8,
-              border: '1px solid #cbd5f5',
-              background: '#f8fafc',
-              cursor: 'pointer',
-            }}
-          >
+          <button type="button" className="secondary-button" onClick={clearFilters} style={{ alignSelf: 'end' }}>
             Clear filters
           </button>
         )}
@@ -169,23 +146,23 @@ export default function Logs() {
       ) : filteredLogs.length === 0 ? (
         <p>No logs found for the current filters.</p>
       ) : (
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
+        <div className="logs-table-wrapper">
+          <table className="logs-table">
             <thead>
-              <tr style={{ textAlign: 'left', background: '#f1f5f9' }}>
-                <th style={{ padding: '10px 12px', borderBottom: '1px solid #e2e8f0' }}>Action</th>
-                <th style={{ padding: '10px 12px', borderBottom: '1px solid #e2e8f0' }}>User</th>
-                <th style={{ padding: '10px 12px', borderBottom: '1px solid #e2e8f0' }}>Timestamp</th>
-                <th style={{ padding: '10px 12px', borderBottom: '1px solid #e2e8f0' }}>Details</th>
+              <tr>
+                <th>Action</th>
+                <th>User</th>
+                <th>Timestamp</th>
+                <th>Details</th>
               </tr>
             </thead>
             <tbody>
               {filteredLogs.map((log) => (
-                <tr key={log.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <td style={{ padding: '10px 12px', fontFamily: 'monospace' }}>{log.action}</td>
-                  <td style={{ padding: '10px 12px' }}>{log.user?.email ?? '—'}</td>
-                  <td style={{ padding: '10px 12px' }}>{formatDateTime(log.createdAt)}</td>
-                  <td style={{ padding: '10px 12px' }}>
+                <tr key={log.id}>
+                  <td style={{ fontFamily: 'monospace' }}>{log.action}</td>
+                  <td>{log.user?.email ?? '—'}</td>
+                  <td>{formatDateTime(log.createdAt)}</td>
+                  <td>
                     <div style={{ display: 'grid', gap: 6 }}>
                       {log.entity ? (
                         <span>
@@ -198,8 +175,8 @@ export default function Logs() {
                       {log.payload !== undefined && log.payload !== null && (
                         <pre
                           style={{
-                            background: '#0f172a',
-                            color: '#e2e8f0',
+                            background: 'var(--color-sidebar-bg)',
+                            color: 'var(--color-sidebar-text)',
                             margin: 0,
                             padding: 8,
                             borderRadius: 6,

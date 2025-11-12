@@ -28,21 +28,22 @@ export default function Auth({ onLogin }: { onLogin: () => void }) {
       register: "Creating account...",
       reset: "Updating password...",
     };
+    const TOAST_DURATION = 6500;
     const t = toast.loading(loadingMessages[mode]);
     try {
       if (mode === "login") {
         const res = await api.post("/api/auth/login", data);
         setToken(res.data.token);
-        toast.success("Welcome!", { id: t });
+        toast.success("Welcome!", { id: t, duration: TOAST_DURATION });
         onLogin();
       } else if (mode === "register") {
         await api.post("/api/auth/register", data);
-        toast.success("Account created! Please sign in.", { id: t });
+        toast.success("Account created! Please sign in.", { id: t, duration: TOAST_DURATION });
         reset({ email: data.email, password: "" });
         setMode("login");
       } else {
         await api.post("/api/auth/reset-password", data);
-        toast.success("Password updated! Please sign in.", { id: t });
+        toast.success("Password updated! Please sign in.", { id: t, duration: TOAST_DURATION });
         reset({ email: data.email, password: "" });
         setMode("login");
       }
@@ -52,7 +53,7 @@ export default function Auth({ onLogin }: { onLogin: () => void }) {
         register: "Could not create account.",
         reset: "Could not reset password.",
       };
-      toast.error(errorMessages[mode], { id: t });
+      toast.error(errorMessages[mode], { id: t, duration: TOAST_DURATION });
     }
   };
 
@@ -80,71 +81,27 @@ export default function Auth({ onLogin }: { onLogin: () => void }) {
       : "Sign in to continue";
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "linear-gradient(135deg, #0ea5e9, #3b82f6)",
-      fontFamily: "system-ui",
-    }}>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        style={{
-          background: "#fff",
-          padding: "2.5rem",
-          borderRadius: "1rem",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
-          width: "100%",
-          maxWidth: "360px",
-          display: "flex",
-          flexDirection: "column",
-          gap: "1rem",
-        }}
-      >
-        <div style={{
-          display: "flex",
-          gap: "0.5rem",
-          justifyContent: "center",
-        }}>
+    <div className="auth-screen">
+      <form onSubmit={handleSubmit(onSubmit)} className="auth-card">
+        <div className="auth-card__switcher">
           <button
             type="button"
             onClick={() => handleModeChange("login")}
-            style={{
-              border: "none",
-              background: mode === "login" ? "#e0f2fe" : "transparent",
-              color: mode === "login" ? "#0284c7" : "#475569",
-              padding: "0.5rem 1rem",
-              borderRadius: "9999px",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
+            className={mode === "login" ? "is-active" : undefined}
           >
             Sign in
           </button>
           <button
             type="button"
             onClick={() => handleModeChange("register")}
-            style={{
-              border: "none",
-              background: mode === "register" ? "#e0f2fe" : "transparent",
-              color: mode === "register" ? "#0284c7" : "#475569",
-              padding: "0.5rem 1rem",
-              borderRadius: "9999px",
-              cursor: "pointer",
-              fontWeight: "bold",
-            }}
+            className={mode === "register" ? "is-active" : undefined}
           >
             Register
           </button>
         </div>
 
-        <h1 style={{
-          textAlign: "center",
-          marginBottom: "0.5rem",
-          color: "#1e3a8a",
-        }}>{title}</h1>
-        <p style={{ textAlign: "center", color: "#6b7280" }}>{subtitle}</p>
+        <h1 style={{ textAlign: "center", marginBottom: "0.5rem", color: "var(--color-heading)" }}>{title}</h1>
+        <p style={{ textAlign: "center", color: "var(--color-text-muted)" }}>{subtitle}</p>
 
         <input
           type="email"
@@ -153,12 +110,14 @@ export default function Auth({ onLogin }: { onLogin: () => void }) {
           style={{
             padding: "0.75rem",
             borderRadius: "0.5rem",
-            border: "1px solid #d1d5db",
+            border: "1px solid var(--color-input-border)",
+            background: "var(--color-input-bg)",
+            color: "var(--color-text)",
             outline: "none",
             fontSize: "1rem"
           }}
         />
-        {errors.email && <small style={{ color: "crimson" }}>{errors.email.message}</small>}
+        {errors.email && <small style={{ color: "var(--color-danger)" }}>{errors.email.message}</small>}
 
         <input
           type="password"
@@ -167,29 +126,19 @@ export default function Auth({ onLogin }: { onLogin: () => void }) {
           style={{
             padding: "0.75rem",
             borderRadius: "0.5rem",
-            border: "1px solid #d1d5db",
+            border: "1px solid var(--color-input-border)",
+            background: "var(--color-input-bg)",
+            color: "var(--color-text)",
             outline: "none",
             fontSize: "1rem"
           }}
         />
-        {errors.password && <small style={{ color: "crimson" }}>{errors.password.message}</small>}
+        {errors.password && <small style={{ color: "var(--color-danger)" }}>{errors.password.message}</small>}
 
         <button
           type="submit"
           disabled={isSubmitting}
-          style={{
-            background: "#0ea5e9",
-            color: "#fff",
-            padding: "0.75rem",
-            borderRadius: "0.5rem",
-            border: "none",
-            fontSize: "1rem",
-            fontWeight: "bold",
-            cursor: "pointer",
-            transition: "background 0.2s"
-          }}
-          onMouseOver={(e) => (e.currentTarget.style.background = "#0284c7")}
-          onMouseOut={(e) => (e.currentTarget.style.background = "#0ea5e9")}
+          className="primary-button"
         >
           {submitLabel}
         </button>
@@ -200,7 +149,7 @@ export default function Auth({ onLogin }: { onLogin: () => void }) {
             style={{
               border: "none",
               background: "transparent",
-              color: "#0284c7",
+              color: "var(--color-accent-strong)",
               cursor: "pointer",
               textDecoration: "underline",
               fontSize: "0.9rem",
@@ -215,7 +164,7 @@ export default function Auth({ onLogin }: { onLogin: () => void }) {
             style={{
               border: "none",
               background: "transparent",
-              color: "#0284c7",
+              color: "var(--color-accent-strong)",
               cursor: "pointer",
               textDecoration: "underline",
               fontSize: "0.9rem",

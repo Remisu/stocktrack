@@ -56,31 +56,34 @@ export default function ProductForm({
   });
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 10 }}>
-      <div>
+    <form onSubmit={handleSubmit} className="product-form product-form--modal">
+      <div className="product-form__field product-form__field--full">
         <label>Name</label>
         <input {...form.register('name')} />
         {form.formState.errors.name && (
-          <small style={{ color: 'crimson' }}>{form.formState.errors.name.message}</small>
+          <small style={{ color: 'var(--color-danger)' }}>{form.formState.errors.name.message}</small>
         )}
       </div>
 
-      <div>
+      <div className="product-form__field product-form__field--sku">
         <label>SKU</label>
         <input
           {...form.register('sku')}
           readOnly={lockSku}
-          style={lockSku ? { background: '#f1f5f9', cursor: 'not-allowed' } : undefined}
+          style={{
+            width: '100%',
+            ...(lockSku ? { background: 'var(--color-surface-muted)', cursor: 'not-allowed' } : {}),
+          }}
         />
         {form.formState.errors.sku && (
-          <small style={{ color: 'crimson' }}>{form.formState.errors.sku.message}</small>
+          <small style={{ color: 'var(--color-danger)' }}>{form.formState.errors.sku.message}</small>
         )}
         {skuNote && !form.formState.errors.sku && (
-          <small style={{ color: '#475569' }}>{skuNote}</small>
+          <small style={{ color: 'var(--color-text-muted)' }}>{skuNote}</small>
         )}
       </div>
 
-      <div>
+      <div className="product-form__field product-form__field--short">
         <label>Price</label>
         <input
           {...form.register('price')}
@@ -93,11 +96,11 @@ export default function ProductForm({
           placeholder="e.g. 19.90"
         />
         {form.formState.errors.price && (
-          <small style={{ color: 'crimson' }}>{form.formState.errors.price.message}</small>
+          <small style={{ color: 'var(--color-danger)' }}>{form.formState.errors.price.message}</small>
         )}
       </div>
 
-      <div>
+      <div className="product-form__field product-form__field--short">
         <label>Stock</label>
         <input
           {...form.register('stock')}
@@ -105,12 +108,12 @@ export default function ProductForm({
           placeholder="e.g. 10"
         />
         {form.formState.errors.stock && (
-          <small style={{ color: 'crimson' }}>{form.formState.errors.stock.message}</small>
+          <small style={{ color: 'var(--color-danger)' }}>{form.formState.errors.stock.message}</small>
         )}
       </div>
 
       {requireImage && (
-        <div>
+        <div className="product-form__field product-form__field--full">
           <label>Image (required)</label>
           <input
             type="file"
@@ -120,23 +123,17 @@ export default function ProductForm({
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 6 }}>
+      <div className="product-form__actions">
         {onCancel && (
-          <button type="button" onClick={onCancel} style={{ padding: '8px 12px', borderRadius: 8 }}>
+          <button type="button" onClick={onCancel} className="secondary-button">
             Cancel
           </button>
         )}
         <button
           type="submit"
           disabled={loading || form.formState.isSubmitting}
-          style={{
-            background: '#2563eb',
-            color: '#fff',
-            border: 'none',
-            padding: '8px 12px',
-            borderRadius: 8,
-            opacity: loading || form.formState.isSubmitting ? 0.7 : 1,
-          }}
+          className="primary-button"
+          style={{ opacity: loading || form.formState.isSubmitting ? 0.7 : 1 }}
         >
           {loading || form.formState.isSubmitting ? 'Saving...' : submitLabel}
         </button>

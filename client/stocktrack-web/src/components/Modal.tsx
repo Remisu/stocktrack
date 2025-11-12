@@ -31,29 +31,38 @@ export default function Modal({ open, title, children, footer, onClose, width = 
       aria-modal="true"
       onMouseDown={onClose}
       style={{
-        position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
+        position: 'fixed',
+        inset: 0,
+        background: 'var(--color-overlay)',
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'center',
+        padding: '40px 16px',
+        overflowY: 'auto',
+        zIndex: 9999,
       }}
     >
       <div
         onMouseDown={(e) => e.stopPropagation()}
         style={{
           width, maxWidth: '95vw',
-          background: '#ffffff',           // light background
-          color: '#0f172a',                // dark text
+          background: 'var(--color-surface)',
+          color: 'var(--color-text)',
           borderRadius: 12,
-          boxShadow: '0 10px 30px rgba(0,0,0,0.15)'
+          boxShadow: 'var(--shadow-modal)',
+          border: '1px solid var(--color-border)',
+          marginBottom: 40,
         }}
       >
         <div style={{
           padding: '14px 18px',
-          borderBottom: '1px solid #eee',
+          borderBottom: '1px solid var(--color-border)',
           display:'flex', alignItems:'center', justifyContent:'space-between',
-          color: '#0f172a'                 // dark title
+          color: 'var(--color-heading)'
         }}>
           <strong style={{ fontSize: 16 }}>{title}</strong>
           <button onClick={onClose} aria-label="Close"
-            style={{ background:'transparent', border:'none', fontSize:20, cursor:'pointer', color:'#0f172a' }}>×</button>
+            style={{ background:'transparent', border:'none', fontSize:20, cursor:'pointer', color:'var(--color-text)' }}>×</button>
         </div>
 
         <div style={{ padding: 18 }}>
@@ -61,7 +70,7 @@ export default function Modal({ open, title, children, footer, onClose, width = 
         </div>
 
         {footer && (
-          <div style={{ padding: 14, borderTop: '1px solid #eee', display:'flex', justifyContent:'flex-end', gap:8 }}>
+          <div style={{ padding: 14, borderTop: '1px solid var(--color-border)', display:'flex', justifyContent:'flex-end', gap:8 }}>
             {footer}
           </div>
         )}
