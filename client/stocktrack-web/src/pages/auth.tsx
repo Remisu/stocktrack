@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
 import { api } from "../lib/api";
 import { setToken } from "../lib/auth";
+import Logo from "../components/Logo";
 
 const schema = z.object({
   email: z.string().email("Invalid email"),
@@ -80,6 +81,8 @@ export default function Auth({ onLogin }: { onLogin: () => void }) {
       ? "Enter your email and a new password"
       : "Sign in to continue";
 
+  const showLogo = mode === "login";
+
   return (
     <div className="auth-screen">
       <form onSubmit={handleSubmit(onSubmit)} className="auth-card">
@@ -100,7 +103,13 @@ export default function Auth({ onLogin }: { onLogin: () => void }) {
           </button>
         </div>
 
-        <h1 style={{ textAlign: "center", marginBottom: "0.5rem", color: "var(--color-heading)" }}>{title}</h1>
+        {showLogo ? (
+          <Logo className="auth-logo" />
+        ) : (
+          <h1 style={{ textAlign: "center", marginBottom: "0.5rem", color: "var(--color-heading)" }}>
+            {title}
+          </h1>
+        )}
         <p style={{ textAlign: "center", color: "var(--color-text-muted)" }}>{subtitle}</p>
 
         <input

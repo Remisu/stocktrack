@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import Logo from '../components/Logo';
 
 type NavItem = {
   key: string;
@@ -24,7 +25,7 @@ export default function AppLayout({
     <div className="app-shell">
       <aside className="app-sidebar">
         <div className="app-sidebar__brand">
-          <div style={{ fontWeight: 700, fontSize: 18 }}>StockTrack</div>
+          <Logo />
           <div style={{ fontSize: 12, opacity: 0.8 }}>Inventory Manager</div>
         </div>
 

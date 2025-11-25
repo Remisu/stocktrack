@@ -119,6 +119,23 @@ button {
   font: inherit;
 }
 
+.stocktrack-logo {
+  display: block;
+  width: 160px;
+  max-width: 100%;
+  height: auto;
+}
+
+.app-sidebar__brand .stocktrack-logo {
+  width: 140px;
+  margin-bottom: 8px;
+}
+
+.auth-logo {
+  width: clamp(150px, 60%, 220px);
+  margin: 0 auto 12px;
+}
+
 :root.theme-transitioning,
 :root.theme-transitioning *,
 :root.theme-transitioning *::before,
